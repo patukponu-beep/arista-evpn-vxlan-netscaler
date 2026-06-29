@@ -115,7 +115,7 @@ The virtual server binds the VIP listener to a service group. The service group 
 ### Underlay and ASN
 
 | Node | AS number |
-|---|---:|---|
+|---|---:|
 | SPINE1 | 65000 | 
 | SPINE2 | 65000 | 
 | LEAF1 | 65001 | 
