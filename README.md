@@ -112,16 +112,16 @@ The virtual server binds the VIP listener to a service group. The service group 
 
 ## Addressing Plan
 
-### Underlay and loopbacks
+### Underlay and ASN
 
-| Node | AS number | Loopback0 |
+| Node | AS number |
 |---|---:|---|
-| SPINE1 | 65000 | 3.3.3.3/32 |
-| SPINE2 | 65000 | 4.4.4.4/32 |
-| LEAF1 | 65001 | 1.1.1.1/32 |
-| LEAF2 | 65002 | 2.2.2.2/32 |
-| LEAF5 | 65005 | 5.5.5.5/32 |
-| EdgeRouter | 65100 | N/A |
+| SPINE1 | 65000 | 
+| SPINE2 | 65000 | 
+| LEAF1 | 65001 | 
+| LEAF2 | 65002 |
+| LEAF5 | 65005 | 
+| EdgeRouter | 65100 |
 
 | Underlay link | Prefix |
 |---|---|
