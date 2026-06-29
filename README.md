@@ -6,6 +6,8 @@
 
 This project extends a two-tier Arista EOS eBGP EVPN-VXLAN lab with a NetScaler ADC VPX application-delivery layer and external eBGP connectivity.
 
+**PLEASE READ ME: Everything used to implement this lab is detailed below. Common constraints and recommended fixes are also highlighted.**
+
 The proof of concept presents a controlled application-entry path:
 
 ```text
@@ -157,11 +159,24 @@ The tenant VRF is `PROD`, with L3VNI `50000`. VLAN 30 is intentionally local to 
 
 ## Prerequisite: Arista EOS Initialisation
 
-Some vEOS images boot with Zero Touch Provisioning enabled and/or use a routing-protocol model other than multi-agent.
+Some vEOS images boot with Zero Touch Provisioning enabled and/or use a routing-protocol model other than multi-agent, and has lab host’s resource limits and how QEMU/EVE-NG emulates interfaces..
 
 If required, complete the following on **every Arista switch** before applying the lab configuration.
 
-### 1. Disable Zero Touch Provisioning
+### 1. Limit vEOS Interfaces
+
+Configure only the virtual interfaces required by the lab, plus one spare where useful. Reducing unused vNICs lowers QEMU/EVE-NG overhead and can improve boot stability on hosts with limited CPU and RAM.
+
+| Device | vNICs to Configure | Suggested Use |
+|---|---:|---|
+| Leaf1, Leaf2, Leaf5 | 5 | 4 Ethernet data ports + 1 management port |
+| Spine1, Spine2 | 4 | 3 Ethernet data ports + 1 management port |
+
+These limits are lab-sizing recommendations, not EOS feature requirements. Add more vNICs only when the topology needs them.
+
+### 2. Disable Zero Touch Provisioning
+
+On a newly deployed vEOS node, disable Zero Touch Provisioning if it is enabled:
 
 ```text
 enable
@@ -169,7 +184,7 @@ zerotouch cancel
 reload
 ```
 
-### 2. Enable multi-agent routing protocol mode
+### 3. Enable multi-agent routing protocol mode
 
 After the first reboot:
 
@@ -181,10 +196,15 @@ end
 write memory
 reload
 ```
+**Note**
+Each affected switch may therefore reboot twice:
 
-Each affected switch therefore reboots twice: once after cancelling Zero Touch Provisioning and once after enabling multi-agent mode.
+After cancelling Zero Touch Provisioning.
+After enabling multi-agent routing protocol mode.
 
-If Zero Touch Provisioning is already disabled and the image is already using multi-agent mode, these steps are not required.
+If Zero Touch Provisioning is already disabled and the EOS image is already using multi-agent mode, these steps are not required.
+
+The vNIC limitation is separate from the Zero Touch Provisioning and multi-agent steps. Limit vNICs only when needed to keep the EVE-NG lab within the available CPU and RAM resources.
 
 ---
 
@@ -242,7 +262,7 @@ For the external proof of concept:
 - LEAF5 and EdgeRouter use eBGP across `100.1.1.0/30`.
 - EdgeRouter advertises `200.1.1.0/30` toward LEAF5.
 - LEAF5 advertises the frontend VIP subnet, `172.16.30.0/24`, toward EdgeRouter.
-- The EdgeRouter intentionally does **not** advertise a route to `172.16.10.0/24`.
+- The LEAF5 intentionally does **not** advertise `172.16.10.0/24` route to the EdgeRouter.
 
 This keeps the backend subnet hidden from the external client while allowing NetScaler to proxy application traffic into the fabric.
 
@@ -350,7 +370,7 @@ Default lab login:
 
 ```text
 Username: nsroot
-Password: nsroot
+Password: nsroot (if you haven't changed it yet. I used "cisco")
 ```
 
 ### 2. Create the SNIP
