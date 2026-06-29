@@ -1,6 +1,6 @@
 # Arista EVPN-VXLAN Fabric with NetScaler ADC Two-Arm Load Balancing
 
-![Lab topology](Topology.png)
+![Lab topology](Topology1.png)
 
 ## Overview
 
