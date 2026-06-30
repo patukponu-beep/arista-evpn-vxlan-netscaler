@@ -321,8 +321,19 @@ ip route
 
 A return path is mandatory.
 
-- If the data interface owns the default route, use `172.16.10.1` as the default gateway.
-- If a separate management NIC obtains the default route through DHCP, retain that management default route and add the specific route to `172.16.20.0/24` through `172.16.10.1`, as shown above.
+The specific route enables inter-VLAN connectivity from the VLAN 10 web servers to the NetScaler SNIP in VLAN 20. It directs traffic for `172.16.20.0/24` through the VLAN 10 anycast IRB gateway (`172.16.10.1`), ensuring return traffic reaches the load balancer through the EVPN-VXLAN fabric rather than being sent through the management interface.
+
+The TestUser host should also have a default route configured toward the EdgeRouter so that traffic destined for the NetScaler VIP and other remote networks is forwarded outside its local subnet.
+
+For a single-NIC deployment without a separate management interface, configure 172.16.10.1 as the default gateway:
+
+```yaml
+        addresses:
+          - 172.16.10.10/24
+        routes:
+          - to: 0.0.0.0/0
+            via: 172.16.10.1
+```
 
 The specific route is required because the SNIP now resides in VLAN 20 while the servers reside in VLAN 10.
 
